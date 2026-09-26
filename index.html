@@ -1,0 +1,490 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>AR · 10 ans · Invitation</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<!-- PLACEHOLDER FONTS (close to the logo style) · replace with the brand fonts when available -->
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;1,400&family=Montserrat:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  /* ================= BRAND TOKENS ================= */
+  :root{
+    --black:#000000;
+    --black-2:#0c0c0c;
+    --white:#ffffff;
+    --grey:#636363;          /* brand grey */
+    --grey-light:#d9d9d9;
+    --grey-lighter:#f2f2f2;
+    --line:rgba(0,0,0,.12);
+    --line-inv:rgba(255,255,255,.14);
+    --font-display:"Playfair Display", Georgia, serif;
+    --font-body:"Montserrat", system-ui, sans-serif;
+
+    /* paper textures (fine grain + long fibres) */
+    --grain-on-dark:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='220' height='220'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 1  0 0 0 0 1  0 0 0 0 1  0 0 0 .09 0'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>");
+    --grain-on-light:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='220' height='220'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='.8' numOctaves='3' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 .07 0'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>");
+  }
+
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{scroll-behavior:smooth}
+  body{background:var(--black);color:var(--black);font-family:var(--font-body);font-weight:300;line-height:1.75;-webkit-font-smoothing:antialiased}
+  body.locked{overflow:hidden;height:100svh}
+  img{max-width:100%;display:block}
+  .eyebrow{font-size:.68rem;letter-spacing:.38em;text-transform:uppercase;font-weight:400}
+  .display{font-family:var(--font-display);font-weight:400;line-height:1.1}
+  .paper-dark{background-image:var(--grain-on-dark)}
+  .paper-light{background-image:var(--grain-on-light)}
+
+  /* ================= 00 · FULL-SCREEN ENVELOPE ================= */
+  /* To use your own paper texture: save it as assets/paper.jpg and set
+     --paper-img:url("assets/paper.jpg") below. Every flap shares the same image, so it lines up. */
+  :root{
+    --paper-img:none;
+    --paper-base:#070707;
+    --speck-light:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='260' height='260'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='.95' numOctaves='4' seed='3' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 1  0 0 0 0 1  0 0 0 0 1  0 0 0 1.2 -.9'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>");
+    --speck-dark:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='260' height='260'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='.7' numOctaves='3' seed='9' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 .5 -.12'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>");
+    --mottle:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='1000' height='1000'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='.006' numOctaves='4' seed='5' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 1  0 0 0 0 1  0 0 0 0 1  0 0 0 .06 -.015'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>");
+    --apex:56%;        /* where the top flap tip + seal sit */
+    --apex-b:56%;      /* where the bottom flap tip sits */
+  }
+  .intro{position:fixed;inset:0;z-index:50;overflow:hidden;pointer-events:none}
+  .envelope{position:absolute;inset:0;perspective:1600px;transform-origin:50% var(--apex);will-change:transform;
+    transition:transform 1.3s cubic-bezier(.45,0,.25,1)}
+  .fl{position:absolute;inset:0;pointer-events:auto;will-change:transform,opacity;transition:transform 1.1s cubic-bezier(.55,0,.25,1), opacity .9s ease}
+  .envelope.s3 .fl{filter:none}  /* drop heavy shadows while moving = no lag */
+  .fl-shape{position:absolute;inset:0;background-color:var(--paper-base);
+    background-image:var(--paper-img),var(--speck-light),var(--speck-dark),var(--mottle);
+    background-size:cover,auto,auto,auto;background-position:center}
+  .fl-shape::after{content:"";position:absolute;inset:0}
+
+  .fl-left  {z-index:1;transform-origin:left center;  filter:drop-shadow(1px 0 0 rgba(255,255,255,.05))}
+  .fl-left  .fl-shape{clip-path:polygon(0 0,50% var(--apex),50% var(--apex-b),0 100%)}
+  .fl-left  .fl-shape::after{background:linear-gradient(90deg,rgba(0,0,0,.18),rgba(255,255,255,.02))}
+  .fl-right {z-index:1;transform-origin:right center; filter:drop-shadow(-1px 0 0 rgba(255,255,255,.05))}
+  .fl-right .fl-shape{clip-path:polygon(100% 0,50% var(--apex),50% var(--apex-b),100% 100%)}
+  .fl-right .fl-shape::after{background:linear-gradient(270deg,rgba(0,0,0,.22),rgba(255,255,255,.015))}
+  .fl-bottom{z-index:2;transform-origin:center bottom;
+    filter:drop-shadow(0 -1px 0 rgba(255,255,255,.07)) drop-shadow(0 -12px 22px rgba(0,0,0,.55))}
+  .fl-bottom .fl-shape{clip-path:polygon(0 100%,50% var(--apex-b),100% 100%)}
+  .fl-bottom .fl-shape::after{background:linear-gradient(0deg,rgba(0,0,0,.05),rgba(255,255,255,.035))}
+  .fl-top   {z-index:3;transform-origin:center top;
+    filter:drop-shadow(0 1px 0 rgba(255,255,255,.08)) drop-shadow(0 16px 26px rgba(0,0,0,.75))}
+  .fl-top   .fl-shape{clip-path:polygon(0 0,100% 0,50% calc(var(--apex) + 3%))}
+  .fl-top   .fl-shape::after{background:linear-gradient(180deg,rgba(255,255,255,.045),rgba(0,0,0,.1))}
+
+  .logo-portrait{display:none}
+  .flap-logo{position:absolute;left:50%;top:14%;transform:translateX(-50%);width:min(340px,56vw);opacity:.92}
+  .env-hint{position:absolute;z-index:6;pointer-events:none;left:0;right:0;top:calc(var(--apex) + clamp(92px,12vw,120px));text-align:center;color:var(--white)}
+  .env-hint .eyebrow{color:var(--grey-light)}
+  .env-hint .small{font-size:.6rem;letter-spacing:.3em;text-transform:uppercase;color:var(--grey-light);opacity:.7;margin-top:10px;animation:blink 2.4s ease-in-out infinite}
+  .env-details{position:absolute;z-index:6;pointer-events:none;left:0;right:0;bottom:max(7%,env(safe-area-inset-bottom));text-align:center;color:var(--white)}
+  .env-details .line{display:flex;justify-content:center;flex-wrap:wrap;gap:6px 22px;font-size:clamp(.62rem,1.6vw,.8rem);letter-spacing:.32em;text-transform:uppercase}
+  .env-details .line span+span::before{content:"";display:inline-block;width:1px;height:10px;background:var(--grey);margin-right:22px;vertical-align:middle}
+  .env-details .dress{margin-top:12px;font-size:.58rem;letter-spacing:.3em;text-transform:uppercase;color:var(--grey)}
+  @keyframes blink{50%{opacity:.35}}
+
+  /* ---- Phones (portrait): the desktop envelope turned 90°, text kept upright ----
+     desktop top flap (seal)  -> comes from the RIGHT
+     desktop bottom flap      -> comes from the LEFT
+     desktop left / right     -> become TOP / BOTTOM                                  */
+  @media (orientation:portrait){
+    .envelope{transform-origin:50% 50%}
+    /* main flap with the seal: from the right edge */
+    .fl-top{z-index:3;transform-origin:right center;filter:drop-shadow(-1px 0 0 rgba(255,255,255,.08)) drop-shadow(-16px 0 26px rgba(0,0,0,.75))}
+    .fl-top .fl-shape{clip-path:polygon(100% 0,100% 100%,47% 50%)}
+    .fl-top .fl-shape::after{background:linear-gradient(270deg,rgba(255,255,255,.045),rgba(0,0,0,.1))}
+    /* opposite flap: from the left edge */
+    .fl-bottom{z-index:2;transform-origin:left center;filter:drop-shadow(1px 0 0 rgba(255,255,255,.07)) drop-shadow(12px 0 22px rgba(0,0,0,.55))}
+    .fl-bottom .fl-shape{clip-path:polygon(0 0,50% 50%,0 100%)}
+    .fl-bottom .fl-shape::after{background:linear-gradient(90deg,rgba(0,0,0,.05),rgba(255,255,255,.035))}
+    /* short sides: top and bottom */
+    .fl-left{z-index:4;transform-origin:center top;filter:drop-shadow(0 1px 0 rgba(255,255,255,.08)) drop-shadow(0 16px 26px rgba(0,0,0,.75))}
+    .fl-left .fl-shape{clip-path:polygon(0 0,100% 0,50% 53%)}
+    .fl-left .fl-shape::after{background:linear-gradient(180deg,rgba(0,0,0,.18),rgba(255,255,255,.02))}
+    .fl-right{z-index:1;transform-origin:center bottom;filter:drop-shadow(0 -1px 0 rgba(255,255,255,.05))}
+    .fl-right .fl-shape{clip-path:polygon(0 100%,50% 50%,100% 100%)}
+    .fl-right .fl-shape::after{background:linear-gradient(0deg,rgba(0,0,0,.22),rgba(255,255,255,.015))}
+    /* upright content */
+    .fl-top .flap-logo{display:none}
+    .logo-portrait{display:block;top:11%;width:min(170px,42vw)}
+    .seal{top:50%;width:clamp(104px,28vw,140px)}
+    .env-hint{top:calc(50% + clamp(116px,33vw,136px))}
+    .env-details .line{flex-direction:column;gap:4px}
+    .env-details .line span+span::before{display:none}
+    /* opening: same as desktop, the top flap first, zoom, then the rest */
+    .intro .envelope.s2 .fl-top{transform:none;opacity:1}
+    .intro .envelope.s2 .fl-left{transform:rotateX(-165deg);opacity:0;transition:transform 1.1s cubic-bezier(.55,0,.25,1), opacity .5s ease .6s}
+    .intro .envelope.s4 .fl-top{transform:rotateY(-95deg);opacity:0}
+    .intro .envelope.s4 .fl-bottom{transform:rotateY(95deg);opacity:0}
+    .intro .envelope.s4 .fl-right{transform:rotateX(95deg);opacity:0}
+  }
+
+  /* wax seal */
+  .seal{position:absolute;left:50%;top:var(--apex);z-index:5;width:clamp(120px,15vw,170px);aspect-ratio:600/557;transform:translate(-50%,-50%);
+    border:none;background:none;cursor:pointer;padding:0;pointer-events:auto;
+    filter:drop-shadow(0 8px 10px rgba(0,0,0,.65));
+    transition:transform .5s cubic-bezier(.5,-0.5,.5,1.5), opacity .45s ease}
+  .seal:hover{transform:translate(-50%,-50%) scale(1.05) rotate(-4deg)}
+  .seal:focus-visible{outline:1px solid var(--white);outline-offset:10px}
+  .seal img,.seal svg{width:100%;height:100%;object-fit:contain}
+
+  /* opening sequence: seal → top flap → zoom → the rest opens onto the page */
+  .envelope.s1 .seal{transform:translate(-50%,-50%) scale(1.3);opacity:0;pointer-events:none}
+  .envelope.s1 .env-hint,.envelope.s1 .env-details{opacity:0;transition:opacity .4s}
+  .envelope.s2 .fl-top{transform:rotateX(-165deg);opacity:0;transition:transform 1.1s cubic-bezier(.55,0,.25,1), opacity .5s ease .6s}
+  .envelope.s3{transform:scale(1.35)}
+  .envelope.s4 .fl-left{transform:rotateY(95deg);opacity:0}
+  .envelope.s4 .fl-right{transform:rotateY(-95deg);opacity:0}
+  .envelope.s4 .fl-bottom{transform:rotateX(95deg);opacity:0}
+  .envelope.s4 .fl{transition:transform 1.1s cubic-bezier(.4,0,.2,1), opacity .7s ease .3s}
+  .intro.done{display:none}
+
+  /* hero content settles in as the envelope opens */
+  .hero-inner{display:flex;flex-direction:column;align-items:center;transform:scale(.92);opacity:.6;transition:transform 1.6s cubic-bezier(.2,.7,.2,1), opacity 1.4s ease}
+  body.opened .hero-inner{transform:none;opacity:1}
+
+  /* ================= MAIN PAGE ================= */
+  section{padding:clamp(80px,12vw,150px) 20px}
+  .wrap{max-width:1000px;margin:0 auto}
+  .center{text-align:center}
+  .muted{color:var(--grey)}
+
+  .btn{display:inline-flex;align-items:center;justify-content:center;margin-top:48px;padding:17px 36px;
+    font:400 .7rem/1 var(--font-body);letter-spacing:.32em;text-transform:uppercase;text-decoration:none;cursor:pointer;
+    border:1px solid currentColor;background:transparent;color:inherit;transition:background .3s,color .3s,border-color .3s}
+  .on-dark .btn:hover{background:var(--white);color:var(--black)}
+  .btn.solid{background:var(--black);color:var(--white);border-color:var(--black)}
+  .btn.solid:hover{background:transparent;color:var(--black)}
+
+  .hero{min-height:100svh;padding-top:clamp(90px,14vh,140px);display:flex;flex-direction:column;align-items:center;justify-content:flex-start;text-align:center;
+    background-color:var(--black);color:var(--white);position:relative}
+  .hero-logo{width:min(680px,86vw)}
+  .hero-eyebrow{color:var(--grey);margin-top:clamp(56px,9vw,96px)}
+  .hero-invite{font-family:var(--font-display);font-weight:400;font-style:italic;font-size:clamp(2.2rem,6vw,3.6rem);line-height:1.1;margin:14px 0 36px}
+  .hero-text{max-width:620px;color:var(--grey-light)}
+  .hero-text p{margin-bottom:20px}
+  .hero .motto{font-size:.8rem;letter-spacing:.6em;margin:36px 0 16px;font-weight:400}
+  .hero .closing{font-family:var(--font-display);font-size:1.3rem}
+  .hero .btn{margin-top:clamp(40px,5vw,56px)}
+
+  /* "scroll to discover" cue, fades out once the visitor scrolls */
+  .scroll-hint{position:fixed;left:0;right:0;bottom:0;z-index:20;padding:90px 16px max(22px,env(safe-area-inset-bottom));
+    background:linear-gradient(to bottom,rgba(0,0,0,0),rgba(0,0,0,.92) 62%);
+    display:flex;flex-direction:column;align-items:center;gap:8px;color:var(--white);text-decoration:none;
+    font-size:.58rem;letter-spacing:.35em;text-transform:uppercase;opacity:0;transition:opacity .6s ease;pointer-events:none}
+  .scroll-hint svg{width:14px;height:14px;animation:nudge 1.8s ease-in-out infinite}
+  body.opened .scroll-hint{opacity:1}
+  body.opened.scrolled .scroll-hint{opacity:0;pointer-events:none}
+  @keyframes nudge{50%{transform:translateY(6px)}}
+
+
+  .info{background-color:var(--grey-lighter)}
+  .info h2{font-size:clamp(2rem,5vw,3rem);margin-top:14px}
+  .grid4{display:grid;grid-template-columns:repeat(4,1fr);border-top:1px solid var(--line);border-bottom:1px solid var(--line);margin-top:52px}
+  .cell{padding:38px 16px;text-align:center;border-right:1px solid var(--line)}
+  .cell:last-child{border-right:none}
+  .cell .eyebrow{color:var(--grey)}
+  .cell .val{font-family:var(--font-display);font-size:1.7rem;margin-top:10px;line-height:1.2}
+  .cell .sub{font-size:.8rem;color:var(--grey);margin-top:4px}
+  .link{display:inline-block;margin-top:12px;font-size:.62rem;letter-spacing:.28em;text-transform:uppercase;color:var(--black);text-decoration:none;border-bottom:1px solid var(--black);padding-bottom:3px}
+  .swatch{display:inline-flex;gap:6px;margin-top:12px}
+  .swatch i{width:18px;height:18px;border-radius:50%;border:1px solid var(--black);background:var(--white)}
+  .swatch i:first-child{background:var(--black)}
+
+  .concept{background-color:var(--black);color:var(--white)}
+  .concept .eyebrow{color:var(--grey-light)}
+  .concept h2{font-size:clamp(1rem,2vw,1.1rem);letter-spacing:.6em;font-family:var(--font-body);font-weight:300;margin-top:16px}
+  .grid3{display:grid;grid-template-columns:repeat(3,1fr);margin-top:64px;border-top:1px solid var(--line-inv)}
+  .grid3 article{padding:52px 30px 20px;border-right:1px solid var(--line-inv)}
+  .grid3 article:last-child{border-right:none}
+  .grid3 .num{font-size:.65rem;letter-spacing:.3em;color:var(--grey)}
+  .grid3 .word{height:clamp(44px,6vw,62px);margin:22px auto 26px;display:flex;justify-content:center}
+  .grid3 .word img{height:100%;width:auto}
+  .grid3 p{font-size:.92rem;color:var(--grey-light);max-width:280px;margin:0 auto}
+
+  .rsvp{background:var(--white)}
+  .rsvp h2{font-size:clamp(2.2rem,6vw,3.4rem);margin:16px 0 22px}
+  .rsvp p{max-width:520px;margin:0 auto}
+  .rsvp .fine{margin-top:clamp(80px,10vw,110px);font-size:.78rem;color:var(--grey);max-width:470px;margin-left:auto;margin-right:auto}
+  .rsvp .fine+.fine{margin-top:10px}
+
+  .contact{background-color:var(--black);color:var(--white);padding:clamp(80px,11vw,130px) 20px 48px}
+  .contact .eyebrow{color:var(--grey)}
+  .contact h2{font-size:clamp(1.7rem,4.5vw,2.4rem);margin:14px 0 20px}
+  .contact a{color:var(--white);text-decoration-color:var(--grey);text-underline-offset:4px}
+  .foot-logo{width:170px;margin:clamp(70px,9vw,100px) auto 18px;opacity:.9}
+  .foot-motto{font-size:.6rem;letter-spacing:.35em;text-transform:uppercase;color:var(--grey)}
+
+  /* ================= MODAL ================= */
+  dialog{margin:auto;border:none;padding:0;width:min(460px,calc(100vw - 32px));background-color:var(--white);color:var(--black);box-shadow:0 30px 90px rgba(0,0,0,.5)}
+  dialog::backdrop{background:rgba(0,0,0,.78);backdrop-filter:blur(4px)}
+  dialog[open]{animation:pop .45s cubic-bezier(.3,.7,.2,1)}
+  @keyframes pop{from{opacity:0;transform:translateY(20px) scale(.97)}}
+  .modal{padding:48px 32px 36px;position:relative}
+  .close{position:absolute;top:14px;right:16px;border:none;background:none;font-size:1.6rem;line-height:1;cursor:pointer;color:var(--grey)}
+  .modal .eyebrow{color:var(--grey)}
+  .modal h3{font-family:var(--font-display);font-weight:400;font-size:2rem;text-align:center;margin:8px 0 30px}
+  .field{margin-bottom:24px}
+  .field label{display:block;font-size:.62rem;letter-spacing:.28em;text-transform:uppercase;color:var(--grey);margin-bottom:6px}
+  .field input{width:100%;border:none;border-bottom:1px solid var(--grey-light);background:transparent;padding:10px 0;font:400 1rem var(--font-body);color:var(--black);outline:none;transition:border-color .2s;border-radius:0}
+  .field input:focus{border-bottom-color:var(--black)}
+  .check{display:flex;gap:12px;align-items:flex-start;cursor:pointer;font-size:.9rem;margin:6px 0 30px}
+  .check input{appearance:none;-webkit-appearance:none;width:20px;height:20px;border:1px solid var(--black);flex:none;margin-top:3px;display:grid;place-items:center;cursor:pointer;border-radius:0}
+  .check input:checked{background:var(--black)}
+  .check input:checked::after{content:"";width:5px;height:10px;border:solid var(--white);border-width:0 2px 2px 0;transform:rotate(45deg) translate(-1px,-1px)}
+  .modal .btn{width:100%;margin-top:0}
+  .err{color:var(--black);font-weight:500;font-size:.78rem;margin-top:-12px;margin-bottom:16px;min-height:1em}
+  .thanks{text-align:center;padding:10px 0 4px}
+  .thanks .mini-seal{width:84px;height:84px;margin:0 auto 18px}
+  .thanks .mini-seal img,.thanks .mini-seal svg{width:100%;height:100%;object-fit:contain}
+  .thanks p{margin-bottom:10px}
+  .thanks .motto{font-size:.7rem;letter-spacing:.5em;margin-top:22px;color:var(--grey)}
+
+  /* ================= RESPONSIVE ================= */
+  @media (max-width:760px){
+    .btn{line-height:18px;text-align:center}
+    .grid4{grid-template-columns:1fr 1fr}
+    .cell:nth-child(2){border-right:none}
+    .cell:nth-child(-n+2){border-bottom:1px solid var(--line)}
+    .grid3{grid-template-columns:1fr}
+    .grid3 article{border-right:none;border-bottom:1px solid var(--line-inv);padding:44px 10px}
+    .grid3 article:last-child{border-bottom:none}
+  }
+  @media (max-width:520px){
+    .env-details .line span+span::before{display:none}
+    .env-details .line{flex-direction:column;gap:4px}
+  }
+  @media (prefers-reduced-motion:reduce){
+    *,*::before,*::after{animation:none!important;transition-duration:.01ms!important}
+    html{scroll-behavior:auto}
+  }
+</style>
+</head>
+<body class="locked">
+
+<!-- Fallback seal, used only if assets/seal.png is missing -->
+<template id="sealFallback">
+  <svg viewBox="0 0 120 120" aria-hidden="true">
+    <defs><radialGradient id="wax" cx="38%" cy="30%" r="80%"><stop offset="0" stop-color="#a0263a"/><stop offset=".55" stop-color="#7a1426"/><stop offset="1" stop-color="#4a0914"/></radialGradient></defs>
+    <path fill="url(#wax)" d="M60 5c8 0 12 4 19 6s12 1 16 7 3 11 7 17 9 9 9 17-5 11-6 18 3 13-2 19-12 4-18 8-8 10-16 11-12-4-19-4-13 4-19 0-5-10-10-15-12-6-14-14 4-12 3-19-7-12-3-19 11-6 15-12 3-13 9-17 12 0 18-3 7-9 16-9z"/>
+    <circle cx="60" cy="60" r="37" fill="none" stroke="rgba(0,0,0,.3)" stroke-width="2.5"/>
+    <circle cx="60" cy="60" r="34" fill="none" stroke="rgba(255,255,255,.15)"/>
+    <text x="60" y="72" text-anchor="middle" font-family="Playfair Display, Georgia, serif" font-size="34" fill="rgba(255,200,205,.45)">10</text>
+  </svg>
+</template>
+
+<!-- ================= 00 · ENVELOPE ================= -->
+<div class="intro" id="intro">
+  <div class="envelope" id="envelope">
+    <div class="fl fl-left"><div class="fl-shape"></div><img class="flap-logo logo-portrait" src="assets/logo-white.png" alt=""></div>
+    <div class="fl fl-right"><div class="fl-shape"></div></div>
+    <div class="fl fl-bottom"><div class="fl-shape"></div></div>
+    <div class="fl fl-top">
+      <div class="fl-shape"></div>
+      <img class="flap-logo" src="assets/logo-white.png" alt="">
+    </div>
+    <div class="env-hint">
+      <div class="eyebrow">Vous êtes invité(e)</div>
+      <div class="small">Cliquez sur le sceau pour ouvrir</div>
+    </div>
+    <div class="env-details">
+      <div class="line"><span>Samedi 10.10.2026</span><span>19h00</span><span>Bachdjerrah</span></div>
+      <div class="dress">Dress code · Black &amp; White</div>
+    </div>
+    <button class="seal" id="seal" aria-label="Ouvrir l'invitation">
+      <img class="seal-img" src="assets/seal.png" alt="">
+    </button>
+  </div>
+</div>
+
+<!-- ================= MAIN ================= -->
+<main id="main">
+
+  <!-- 01 · HERO -->
+  <section class="hero on-dark paper-dark">
+    <div class="hero-inner">
+      <img class="hero-logo" src="assets/logo-white.png" alt="AR 10 Years Anniversary · Then Now NXT">
+      <div class="eyebrow hero-eyebrow">Invitation</div>
+      <h1 class="hero-invite">Vous êtes invité(e)</h1>
+      <div class="hero-text">
+        <p>Il y a dix ans, un foulard a reçu un nom.<br>Un nom qui allait devenir une histoire, une identité et une aventure.</p>
+        <p>Aujourd’hui, Amira Riaa célèbre dix années de création, de rencontres et de transmission.</p>
+        <p>Pour marquer cette étape, nous vous invitons à entrer dans cette histoire le temps d’une soirée.</p>
+        <p>Une soirée pour regarder ce qui a été, ce qui est et ce qui vient. Pour célébrer le chemin parcouru, celles et ceux qui l’ont façonné, et imaginer ensemble la suite.</p>
+      </div>
+      <div class="motto">THEN · NOW · NXT</div>
+      <em class="closing">Nous avons hâte de partager ce moment avec vous.</em>
+      <a class="btn" href="#rsvp">Confirmer ma présence</a>
+    </div>
+  </section>
+
+  <!-- 03 · INFORMATIONS -->
+  <section class="info center paper-light" id="infos">
+    <div class="wrap">
+      <h2 class="display">Informations</h2>
+      <div class="grid4">
+        <div class="cell"><div class="eyebrow">Date</div><div class="val">10.10.2026</div><div class="sub">Samedi</div></div>
+        <div class="cell"><div class="eyebrow">Heure</div><div class="val">19h00</div></div>
+        <div class="cell"><div class="eyebrow">Lieu</div><div class="val">Bachdjerrah</div>
+          <a class="link" href="https://maps.app.goo.gl/PPjfzqzFahpNwkuEA?g_st=ic" target="_blank" rel="noopener">Voir l’itinéraire →</a></div>
+        <div class="cell"><div class="eyebrow">Dress code</div><div class="val">Black &amp; White</div><div class="swatch"><i></i><i></i></div></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 04 · CONCEPT -->
+  <section class="concept center paper-dark">
+    <div class="wrap">
+      <div class="eyebrow">Concept</div>
+      <h2>THEN · NOW · NEXT</h2>
+      <div class="grid3">
+        <article><div class="num">01</div><div class="word"><img src="assets/then-white.png" alt="Then"></div>
+          <p>Célébrer nos origines, notre histoire et le chemin parcouru.</p></article>
+        <article><div class="num">02</div><div class="word"><img src="assets/now-white.png" alt="Now"></div>
+          <p>Célébrer nos réalisations, nos équipes, nos partenaires et le présent que nous construisons ensemble.</p></article>
+        <article><div class="num">03</div><div class="word"><img src="assets/next-white.png" alt="Next"></div>
+          <p>Se tourner vers l’avenir, les nouvelles idées, les nouvelles ambitions et les possibilités à venir.</p></article>
+      </div>
+    </div>
+  </section>
+
+  <!-- 05 · RSVP -->
+  <section class="rsvp center" id="rsvp">
+    <div class="wrap">
+      <div class="eyebrow muted">RSVP</div>
+      <h2 class="display">Confirmez votre présence</h2>
+      <p>Nous vous invitons à confirmer votre présence en remplissant le formulaire.</p>
+      <button class="btn solid" id="openForm">RSVP</button>
+      <p class="fine">Cette invitation est personnelle et non transférable.</p>
+      <p class="fine">Nous vous demandons de garder cette soirée pour ceux qui la vivent : aucune publication avant le lendemain.</p>
+    </div>
+  </section>
+
+  <!-- 06 · CONTACT + FOOTER -->
+  <footer class="contact center on-dark paper-dark">
+    <div class="wrap">
+      <div class="eyebrow">Contact</div>
+      <h2 class="display">Besoin d’informations ?</h2>
+      <p><a href="tel:+213794314465">0794 31 44 65</a><br>
+        <a href="mailto:ferdous@geometriceldjazair.com">ferdous@geometriceldjazair.com</a></p>
+      <img class="foot-logo" src="assets/logo-white.png" alt="AR 10 Years Anniversary">
+      <div class="foot-motto">Then · Now · Next</div>
+    </div>
+  </footer>
+</main>
+
+<a class="scroll-hint" href="#infos" aria-label="Défiler pour en savoir plus">
+  Défilez pour en savoir plus
+  <svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.2"><path d="M2 5l5 5 5-5"/></svg>
+</a>
+
+<!-- ================= RSVP MODAL ================= -->
+<dialog id="dlg" aria-labelledby="dlgTitle">
+  <div class="modal paper-light">
+    <button class="close" id="closeForm" aria-label="Fermer">×</button>
+
+    <form id="rsvpForm" novalidate>
+      <div class="eyebrow center">RSVP</div>
+      <h3 id="dlgTitle">Confirmez votre présence</h3>
+      <div class="field">
+        <label for="name">Nom et prénom</label>
+        <input id="name" name="name" autocomplete="name" required>
+      </div>
+      <div class="field">
+        <label for="phone">Numéro de téléphone</label>
+        <input id="phone" name="phone" type="tel" inputmode="tel" autocomplete="tel" required>
+      </div>
+      <label class="check">
+        <input type="checkbox" id="attending" name="attending">
+        <span>Oui, je confirme ma présence</span>
+      </label>
+      <div class="err" id="err" role="alert"></div>
+      <button class="btn solid" type="submit" id="submitBtn">Confirmer</button>
+    </form>
+
+    <div class="thanks" id="thanks" hidden>
+      <div class="mini-seal"><img class="seal-img" src="assets/seal.png" alt=""></div>
+      <div class="eyebrow">RSVP confirmé</div>
+      <h3>Merci</h3>
+      <p id="thanksMsg">Votre présence a bien été confirmée.</p>
+      <p id="thanksMsg2">Nous avons hâte de célébrer avec vous les 10 ans de AR.</p>
+      <div class="motto">THEN · NOW · NEXT</div>
+    </div>
+  </div>
+</dialog>
+
+<script>
+  /* Paste the Google Apps Script web-app URL here. Empty = demo mode (nothing is saved). */
+  const SCRIPT_URL = "";
+
+  // Seal image fallback (until assets/seal.png is added)
+  document.querySelectorAll(".seal-img").forEach(img => {
+    const swap = () => img.replaceWith(document.getElementById("sealFallback").content.cloneNode(true));
+    if (img.complete && img.naturalWidth === 0) swap(); else img.addEventListener("error", swap);
+  });
+
+  const intro = document.getElementById("intro");
+  const env = document.getElementById("envelope");
+  const main = document.getElementById("main");
+  const reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+  // ---------- Opening sequence ----------
+  document.getElementById("seal").addEventListener("click", () => {
+    const t = reduce ? [0,0,0,0,50] : [0, 300, 950, 1450, 2700];
+    setTimeout(() => env.classList.add("s1"), t[0]);   // seal breaks
+    setTimeout(() => env.classList.add("s2"), t[1]);   // top flap opens
+    setTimeout(() => env.classList.add("s3"), t[2]);   // zoom in
+    setTimeout(() => {                                 // the rest opens onto the page
+      env.classList.add("s4");
+      document.body.classList.add("opened");
+    }, t[3]);
+    setTimeout(() => {                                 // done
+      intro.classList.add("done");
+      document.body.classList.remove("locked");
+    }, t[4]);
+  }, { once: true });
+
+  addEventListener("scroll", () => document.body.classList.toggle("scrolled", scrollY > 60), { passive:true });
+
+  // ---------- RSVP modal ----------
+  const dlg = document.getElementById("dlg");
+  const form = document.getElementById("rsvpForm");
+  const thanks = document.getElementById("thanks");
+  const err = document.getElementById("err");
+  document.getElementById("openForm").onclick = () => dlg.showModal();
+  document.getElementById("closeForm").onclick = () => dlg.close();
+  dlg.addEventListener("click", e => { if (e.target === dlg) dlg.close(); });
+
+  form.addEventListener("submit", async e => {
+    e.preventDefault();
+    const name = form.name.value.trim();
+    const phone = form.phone.value.replace(/[\s.-]/g, "");
+    const attending = form.attending.checked;
+    if (name.length < 3) { err.textContent = "Merci d’indiquer votre nom et prénom."; return; }
+    if (!/^(\+213|0)[5-7]\d{8}$/.test(phone)) { err.textContent = "Numéro invalide (ex. 0794314465)."; return; }
+    err.textContent = "";
+
+    const btn = document.getElementById("submitBtn");
+    btn.disabled = true; btn.textContent = "Envoi…";
+    try {
+      if (SCRIPT_URL) {
+        await fetch(SCRIPT_URL, { method: "POST", mode: "no-cors",
+          body: new URLSearchParams({ name, phone, attending: attending ? "Oui" : "Non" }) });
+      } else {
+        await new Promise(r => setTimeout(r, 700)); // demo
+      }
+      if (!attending) {
+        document.getElementById("thanksMsg").textContent = "Votre réponse a bien été enregistrée.";
+        document.getElementById("thanksMsg2").textContent = "Vous nous manquerez. Merci de nous avoir prévenus.";
+      }
+      form.hidden = true; thanks.hidden = false;
+    } catch {
+      err.textContent = "Une erreur est survenue. Veuillez réessayer.";
+      btn.disabled = false; btn.textContent = "Confirmer";
+    }
+  });
+</script>
+</body>
+</html>
