@@ -122,7 +122,7 @@
   }
 
   /* wax seal */
-  .seal{position:absolute;left:50%;top:var(--apex);z-index:5;width:clamp(120px,15vw,170px);aspect-ratio:600/557;transform:translate(-50%,-50%);
+  .seal{position:absolute;left:50%;top:var(--apex);z-index:5;width:clamp(120px,15vw,170px);aspect-ratio:437/425;transform:translate(-50%,-50%);
     border:none;background:none;cursor:pointer;padding:0;pointer-events:auto;
     filter:drop-shadow(0 8px 10px rgba(0,0,0,.65));
     transition:transform .5s cubic-bezier(.5,-0.5,.5,1.5), opacity .45s ease}
@@ -267,11 +267,11 @@
 <!-- Fallback seal, used only if assets/seal.png is missing -->
 <template id="sealFallback">
   <svg viewBox="0 0 120 120" aria-hidden="true">
-    <defs><radialGradient id="wax" cx="38%" cy="30%" r="80%"><stop offset="0" stop-color="#a0263a"/><stop offset=".55" stop-color="#7a1426"/><stop offset="1" stop-color="#4a0914"/></radialGradient></defs>
+    <defs><radialGradient id="wax" cx="38%" cy="30%" r="80%"><stop offset="0" stop-color="#e6e6e6"/><stop offset=".55" stop-color="#b5b5b5"/><stop offset="1" stop-color="#7a7a7a"/></radialGradient></defs>
     <path fill="url(#wax)" d="M60 5c8 0 12 4 19 6s12 1 16 7 3 11 7 17 9 9 9 17-5 11-6 18 3 13-2 19-12 4-18 8-8 10-16 11-12-4-19-4-13 4-19 0-5-10-10-15-12-6-14-14 4-12 3-19-7-12-3-19 11-6 15-12 3-13 9-17 12 0 18-3 7-9 16-9z"/>
     <circle cx="60" cy="60" r="37" fill="none" stroke="rgba(0,0,0,.3)" stroke-width="2.5"/>
     <circle cx="60" cy="60" r="34" fill="none" stroke="rgba(255,255,255,.15)"/>
-    <text x="60" y="72" text-anchor="middle" font-family="Playfair Display, Georgia, serif" font-size="34" fill="rgba(255,200,205,.45)">10</text>
+    <text x="60" y="72" text-anchor="middle" font-family="Playfair Display, Georgia, serif" font-size="34" fill="rgba(60,60,60,.5)">10</text>
   </svg>
 </template>
 
@@ -316,7 +316,7 @@
       </div>
       <div class="motto">THEN · NOW · NXT</div>
       <em class="closing">Nous avons hâte de partager ce moment avec vous.</em>
-      <a class="btn" href="#rsvp">Confirmer ma présence</a>
+      <button class="btn" type="button" data-open-rsvp>Confirmer ma présence</button>
     </div>
   </section>
 
@@ -338,13 +338,13 @@
   <section class="concept center paper-dark">
     <div class="wrap">
       <div class="eyebrow">Concept</div>
-      <h2>THEN · NOW · NEXT</h2>
+      <h2>THEN · NOW · NXT</h2>
       <div class="grid3">
         <article><div class="num">01</div><div class="word"><img src="assets/then-white.png" alt="Then"></div>
           <p>Célébrer nos origines, notre histoire et le chemin parcouru.</p></article>
         <article><div class="num">02</div><div class="word"><img src="assets/now-white.png" alt="Now"></div>
           <p>Célébrer nos réalisations, nos équipes, nos partenaires et le présent que nous construisons ensemble.</p></article>
-        <article><div class="num">03</div><div class="word"><img src="assets/next-white.png" alt="Next"></div>
+        <article><div class="num">03</div><div class="word"><img src="assets/nxt-white.png" alt="NXT"></div>
           <p>Se tourner vers l’avenir, les nouvelles idées, les nouvelles ambitions et les possibilités à venir.</p></article>
       </div>
     </div>
@@ -370,7 +370,7 @@
       <p><a href="tel:+213794314465">0794 31 44 65</a><br>
         <a href="mailto:ferdous@geometriceldjazair.com">ferdous@geometriceldjazair.com</a></p>
       <img class="foot-logo" src="assets/logo-white.png" alt="AR 10 Years Anniversary">
-      <div class="foot-motto">Then · Now · Next</div>
+      <div class="foot-motto">Then · Now · NXT</div>
     </div>
   </footer>
 </main>
@@ -410,7 +410,7 @@
       <h3>Merci</h3>
       <p id="thanksMsg">Votre présence a bien été confirmée.</p>
       <p id="thanksMsg2">Nous avons hâte de célébrer avec vous les 10 ans de AR.</p>
-      <div class="motto">THEN · NOW · NEXT</div>
+      <div class="motto">THEN · NOW · NXT</div>
     </div>
   </div>
 </dialog>
@@ -453,7 +453,7 @@
   const form = document.getElementById("rsvpForm");
   const thanks = document.getElementById("thanks");
   const err = document.getElementById("err");
-  document.getElementById("openForm").onclick = () => dlg.showModal();
+  document.querySelectorAll("#openForm, [data-open-rsvp]").forEach(b => b.onclick = () => dlg.showModal());
   document.getElementById("closeForm").onclick = () => dlg.close();
   dlg.addEventListener("click", e => { if (e.target === dlg) dlg.close(); });
 
